@@ -1,9 +1,10 @@
-/**
- * @module Exports
- */
+import { FormSelect } from './lib/components';
+import formRendererConnector from './lib/connectors/formRenderer';
 
-import './lib/api';
-import './lib/routes';
-
-// Export types needed for other modules here
-export * from './lib/boilerplate.types';
+formRendererConnector.api.fieldRegistry.add([
+	{
+		name: 'formsReference',
+		module: 'forms',
+		component: FormSelect,
+	},
+]);
