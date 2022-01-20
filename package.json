@@ -1,6 +1,6 @@
 {
   "name": "@redactie/form-module",
-  "version": "0.0.0-3",
+  "version": "0.0.0-4",
   "description": "redactie form module",
   "main": "dist/redactie-form-module.umd.js",
   "module": "dist/redactie-form-module.umd.js",
