@@ -2,7 +2,7 @@ import Core from '@redactie/redactie-core';
 import ky from 'ky';
 import { stringify } from 'query-string';
 
-import { FORMS_REQUEST_PREFIX_URL } from './api.service.const';
+import { FORM_REQUEST_PREFIX_URL } from './api.service.const';
 import { SearchParams } from './api.service.types';
 
 export type KyInstance = typeof ky;
@@ -11,7 +11,7 @@ const CoreConfig = Core.config.getValue('core') || {};
 
 // Create ky instance with defaults
 const api: KyInstance = ky.create({
-	prefixUrl: FORMS_REQUEST_PREFIX_URL,
+	prefixUrl: FORM_REQUEST_PREFIX_URL,
 	timeout: false,
 	headers: {
 		'x-tenant-id': CoreConfig.tenantId,

@@ -1,4 +1,4 @@
-# Redactie forms module (React)
+# Redactie form module (React)
 
 ## How to start?
 

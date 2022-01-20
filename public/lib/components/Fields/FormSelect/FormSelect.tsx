@@ -1,14 +1,15 @@
 import { Autocomplete } from '@acpaas-ui/react-components';
 import { Tooltip } from '@acpaas-ui/react-editorial-components';
 import { InputFieldProps } from '@redactie/form-renderer-module';
-import { DataLoader } from '@redactie/utils';
+import { LoadingState } from '@redactie/utils';
 import classNames from 'classnames';
 import { getIn } from 'formik';
 import debounce from 'lodash.debounce';
-import React, { FC, ReactElement, useCallback, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { first } from 'rxjs/operators';
 
 import formRendererConnector from '../../../connectors/formRenderer';
+import { useForms } from '../../../hooks';
 import { FormModel, formsFacade } from '../../../store/forms';
 
 import { FORM_SELECT_TOOLTIP_DELAY, FORM_SELECT_TOOLTIP_TYPE } from './FormSelect.const';
@@ -23,6 +24,7 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 	const state = !!error && !!touch ? 'error' : '';
 	const autoCompleteRef = useRef(null);
 	const [isVisible, setVisibility] = useState(false);
+	const [formsLoadingState] = useForms(`search_${fieldSchema.name}`);
 	const [isHoveringTooltip, setHoveringTooltip] = useState(false);
 	const [delayShowLoop, setDelayShowLoop] = useState<NodeJS.Timeout>();
 	const [delayHideLoop, setDelayHideLoop] = useState<NodeJS.Timeout>();
@@ -33,16 +35,17 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 
 		return item;
 	}, [field.value, items]);
+
 	const debouncedGetItems = debounce(async (query, cb) => {
-		await formsFacade.getForms(`search_${fieldSchema.name}`, query);
+		await formsFacade.getForms(`search_${fieldSchema.name}`, query, true);
 
 		formsFacade
 			.selectItemValue(`search_${fieldSchema.name}`)
 			.pipe(first())
 			.subscribe(forms => {
 				const newItems = ((forms as FormModel[]) || []).map(form => ({
-					id: form.id,
-					slug: form.slug,
+					label: form.slug,
+					value: form.id,
 				}));
 
 				setItems(newItems);
@@ -104,13 +107,15 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 		keyInteraction.current = true;
 	};
 
-	const setContentValue = (uuid: string): void => {
+	const setFormValue = (uuid: string): void => {
 		keyInteraction.current = false;
 
 		const item = items.find(item => item.value === uuid);
 
 		if (item) {
-			return fieldHelperProps.setValue(item.id);
+			return fieldHelperProps.setValue({
+				identifier: item.id,
+			});
 		}
 	};
 
@@ -118,54 +123,48 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 	 * Render
 	 */
 
-	const renderFormFields = (): ReactElement | null => {
-		return (
-			<>
-				<div
+	return (
+		<>
+			<div
+				ref={autoCompleteRef}
+				className={classNames('a-input', 'a-form-select-input')}
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}
+				onKeyDown={handleKeyDown}
+			>
+				<FormRendererFieldTitle isRequired={!!fieldSchema.config?.required}>
+					{fieldSchema?.label}
+				</FormRendererFieldTitle>
+				<Autocomplete
 					ref={autoCompleteRef}
-					className={classNames('a-input', 'a-form-select-input')}
-					onMouseEnter={handleMouseEnter}
-					onMouseLeave={handleMouseLeave}
-					onKeyDown={handleKeyDown}
-				>
-					<FormRendererFieldTitle isRequired={!!fieldSchema.config?.required}>
-						{fieldSchema?.label}
-					</FormRendererFieldTitle>
-					<Autocomplete
-						ref={autoCompleteRef}
-						id={fieldSchema.name}
-						state={state}
-						multipleSelect={false}
-						defaultValue={field.value}
-						showSearchIcon={true}
-						disabled={!!config.disabled}
-						// loading={contentLoadingState === LoadingState.Loading}
-						onSelection={setContentValue}
-						asyncItems={(query: string, cb: (options: any[]) => void) => {
-							debouncedGetItems(query, cb);
-						}}
-					/>
+					id={fieldSchema.name}
+					state={state}
+					multipleSelect={false}
+					defaultValue={field.value}
+					showSearchIcon={true}
+					disabled={!!config.disabled}
+					loading={formsLoadingState === LoadingState.Loading}
+					onSelection={setFormValue}
+					asyncItems={debouncedGetItems}
+				/>
+			</div>
+			<Tooltip
+				type={FORM_SELECT_TOOLTIP_TYPE}
+				isVisible={!!currentItem?.label && (isVisible || isHoveringTooltip)}
+				targetRef={autoCompleteRef}
+				onMouseEnter={handleTooltipMouseEnter}
+				onMouseLeave={handleTooltipMouseLeave}
+			>
+				{currentItem?.label}
+			</Tooltip>
+			{config.description ? (
+				<div className="a-input a-input__wrapper">
+					<small>{config.description}</small>
 				</div>
-				<Tooltip
-					type={FORM_SELECT_TOOLTIP_TYPE}
-					isVisible={!!currentItem?.label && (isVisible || isHoveringTooltip)}
-					targetRef={autoCompleteRef}
-					onMouseEnter={handleTooltipMouseEnter}
-					onMouseLeave={handleTooltipMouseLeave}
-				>
-					{currentItem?.label}
-				</Tooltip>
-				{config.description ? (
-					<div className="a-input a-input__wrapper">
-						<small>{config.description}</small>
-					</div>
-				) : null}
-				<ErrorMessage name={field.name} />
-			</>
-		);
-	};
-
-	return <DataLoader loadingState={true} render={renderFormFields} />;
+			) : null}
+			<ErrorMessage name={field.name} />
+		</>
+	);
 };
 
 export default FormSelect;
