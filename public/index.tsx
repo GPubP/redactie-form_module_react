@@ -3,8 +3,8 @@ import formRendererConnector from './lib/connectors/formRenderer';
 
 formRendererConnector.api.fieldRegistry.add([
 	{
-		name: 'formsReference',
-		module: 'forms',
+		name: 'formReference',
+		module: 'form',
 		component: FormSelect,
 	},
 ]);
