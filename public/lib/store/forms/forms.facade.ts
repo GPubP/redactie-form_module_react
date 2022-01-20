@@ -24,7 +24,7 @@ export class FormsFacade extends BaseMultiEntityFacade<FormsStore, FormsApiServi
 			.getForms(query)
 			.then(response => {
 				if (response) {
-					this.store.setItemValue(key, response._embedded);
+					this.store.setItemValue(key, response._embedded.resourceList);
 				}
 			})
 			.catch(error => {

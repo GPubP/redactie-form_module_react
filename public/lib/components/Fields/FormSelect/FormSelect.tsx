@@ -1,6 +1,5 @@
 import { Autocomplete } from '@acpaas-ui/react-components';
 import { Tooltip } from '@acpaas-ui/react-editorial-components';
-import { InputFieldProps } from '@redactie/form-renderer-module';
 import { LoadingState } from '@redactie/utils';
 import classNames from 'classnames';
 import { getIn } from 'formik';
@@ -13,8 +12,9 @@ import { useForms } from '../../../hooks';
 import { FormModel, formsFacade } from '../../../store/forms';
 
 import { FORM_SELECT_TOOLTIP_DELAY, FORM_SELECT_TOOLTIP_TYPE } from './FormSelect.const';
+import { FormSelectFieldProps } from './FormSelect.types';
 
-const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperProps }) => {
+const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHelperProps }) => {
 	const config = fieldSchema.config || {};
 	const { field, form } = fieldProps;
 
@@ -29,9 +29,9 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 	const [delayShowLoop, setDelayShowLoop] = useState<NodeJS.Timeout>();
 	const [delayHideLoop, setDelayHideLoop] = useState<NodeJS.Timeout>();
 	const keyInteraction = useRef<boolean>(false);
-	const [items, setItems] = useState<any[]>([]);
+	const [items, setItems] = useState<{ label: string; value: string }[]>([]);
 	const currentItem = useMemo(() => {
-		const item = items.find(i => i.value === field.value);
+		const item = items.find(i => i.value === field.value.identifier);
 
 		return item;
 	}, [field.value, items]);
@@ -44,8 +44,8 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 			.pipe(first())
 			.subscribe(forms => {
 				const newItems = ((forms as FormModel[]) || []).map(form => ({
-					label: form.slug,
-					value: form.id,
+					label: form.name,
+					value: form.identifier,
 				}));
 
 				setItems(newItems);
@@ -114,7 +114,7 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 
 		if (item) {
 			return fieldHelperProps.setValue({
-				identifier: item.id,
+				identifier: item.value,
 			});
 		}
 	};
@@ -140,7 +140,7 @@ const FormSelect: FC<InputFieldProps> = ({ fieldSchema, fieldProps, fieldHelperP
 					id={fieldSchema.name}
 					state={state}
 					multipleSelect={false}
-					defaultValue={field.value}
+					defaultValue={field.value.identifier}
 					showSearchIcon={true}
 					disabled={!!config.disabled}
 					loading={formsLoadingState === LoadingState.Loading}

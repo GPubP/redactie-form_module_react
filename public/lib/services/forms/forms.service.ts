@@ -6,7 +6,7 @@ export class FormsApiService {
 	public async getForms(query: string): Promise<FormsResponse> {
 		return await apiService
 			.get('form', {
-				searchParams: parseSearchParams({ query }),
+				searchParams: parseSearchParams({ q: query }),
 			})
 			.json<FormsResponse>();
 	}
