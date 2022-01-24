@@ -31,7 +31,7 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 	const keyInteraction = useRef<boolean>(false);
 	const [items, setItems] = useState<{ label: string; value: string }[]>([]);
 	const currentItem = useMemo(() => {
-		const item = items.find(i => i.value === field.value.identifier);
+		const item = items.find(i => i.value === field.value?.identifier);
 
 		return item;
 	}, [field.value, items]);
@@ -140,7 +140,7 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 					id={fieldSchema.name}
 					state={state}
 					multipleSelect={false}
-					defaultValue={field.value.identifier}
+					defaultValue={field.value?.identifier}
 					showSearchIcon={true}
 					disabled={!!config.disabled}
 					loading={formsLoadingState === LoadingState.Loading}
