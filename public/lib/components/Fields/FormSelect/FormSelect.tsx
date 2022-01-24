@@ -1,6 +1,6 @@
 import { Autocomplete } from '@acpaas-ui/react-components';
 import { Tooltip } from '@acpaas-ui/react-editorial-components';
-import { LoadingState } from '@redactie/utils';
+import { LoadingState, useSiteContext } from '@redactie/utils';
 import classNames from 'classnames';
 import { getIn } from 'formik';
 import debounce from 'lodash.debounce';
@@ -21,6 +21,7 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 	const touch = getIn(form.touched, field.name);
 	const error = getIn(form.errors, field.name);
 
+	const { siteId } = useSiteContext();
 	const state = !!error && !!touch ? 'error' : '';
 	const autoCompleteRef = useRef(null);
 	const [isVisible, setVisibility] = useState(false);
@@ -37,7 +38,7 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 	}, [field.value, items]);
 
 	const debouncedGetItems = debounce(async (query, cb) => {
-		await formsFacade.getForms(`search_${fieldSchema.name}`, query, true);
+		await formsFacade.getForms(`search_${fieldSchema.name}`, query, siteId, true);
 
 		formsFacade
 			.selectItemValue(`search_${fieldSchema.name}`)

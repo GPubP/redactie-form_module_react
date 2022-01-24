@@ -1,1 +1,2 @@
-export const FORM_REQUEST_PREFIX_URL = '/v1/proxy/admin/form/v1/';
+export const FORMS_PREFIX_URL = 'forms/v1/forms';
+export const SITE_FORMS_PREFIX_URL = 'forms/v1/sites';

@@ -11,7 +11,12 @@ export class FormsFacade extends BaseMultiEntityFacade<FormsStore, FormsApiServi
 	/**
 	 * API integration
 	 */
-	public async getForms(key: string, query: string, reload = false): Promise<void> {
+	public async getForms(
+		key: string,
+		query: string,
+		siteId: string,
+		reload = false
+	): Promise<void> {
 		const oldValue = this.query.getItem(key);
 
 		if (!reload && oldValue) {
@@ -21,7 +26,7 @@ export class FormsFacade extends BaseMultiEntityFacade<FormsStore, FormsApiServi
 		reload && oldValue ? this.store.setItemIsFetching(key, true) : this.store.addItem(key);
 
 		return this.service
-			.getForms(query)
+			.getForms(query, siteId)
 			.then(response => {
 				if (response) {
 					this.store.setItemValue(key, response._embedded.resourceList);
