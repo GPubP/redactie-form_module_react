@@ -5,9 +5,7 @@ import { FormsResponse } from './forms.service.types';
 
 export class FormsApiService {
 	public async getForms(query: string, siteId: string): Promise<FormsResponse> {
-		const path = siteId
-			? `${SITE_FORMS_PREFIX_URL}/${siteId}/forms`
-			: `${FORMS_PREFIX_URL}/forms`;
+		const path = siteId ? `${SITE_FORMS_PREFIX_URL}/${siteId}/forms` : FORMS_PREFIX_URL;
 
 		return apiService
 			.get(path, {
