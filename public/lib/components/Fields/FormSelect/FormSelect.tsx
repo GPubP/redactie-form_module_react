@@ -34,10 +34,16 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 	const [delayHideLoop, setDelayHideLoop] = useState<NodeJS.Timeout>();
 	const keyInteraction = useRef<boolean>(false);
 	const [items, setItems] = useState<{ label: string; value: string }[]>([]);
+	const [prevQuery, setPrevQuery] = useState('');
 	const currentItem = useMemo(() => {
 		const item = items.find(i => i.value === field.value?.identifier);
 
+		if (item && item?.label !== prevQuery) {
+			setPrevQuery(item?.label || '');
+		}
+
 		return item;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [field.value, items]);
 
 	const debouncedGetItems = debounce(async (query, cb) => {
@@ -116,11 +122,9 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 
 		const item = items.find(item => item.value === uuid);
 
-		if (item) {
-			return fieldHelperProps.setValue({
-				identifier: item.value,
-			});
-		}
+		fieldHelperProps.setValue({
+			identifier: item?.value,
+		});
 	};
 
 	/**
@@ -149,7 +153,23 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 					disabled={!!config.disabled}
 					loading={formsLoadingState === LoadingState.Loading}
 					onSelection={setFormValue}
-					asyncItems={debouncedGetItems}
+					asyncItems={(query: string, cb: (options: any[]) => void) => {
+						if (
+							currentItem &&
+							query !== currentItem?.label &&
+							query !== currentItem?.value
+						) {
+							setFormValue('');
+						}
+
+						if (currentItem && query === prevQuery) {
+							debouncedGetItems(currentItem.value, cb);
+							return;
+						}
+
+						setPrevQuery(query);
+						debouncedGetItems(query, cb);
+					}}
 				/>
 			</div>
 			<Tooltip
