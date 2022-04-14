@@ -12,7 +12,10 @@ import { useForms } from '../../../hooks';
 import { FormModel, formsFacade } from '../../../store/forms';
 
 import { FORM_SELECT_TOOLTIP_DELAY, FORM_SELECT_TOOLTIP_TYPE } from './FormSelect.const';
+import styles from './FormSelect.module.scss';
 import { FormSelectFieldProps } from './FormSelect.types';
+
+const cx = classNames.bind(styles);
 
 const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHelperProps }) => {
 	const config = fieldSchema.config || {};
@@ -128,7 +131,7 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 		<>
 			<div
 				ref={autoCompleteRef}
-				className={classNames('a-input', 'a-form-select-input')}
+				className={cx('a-input', 'a-form-select-input')}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 				onKeyDown={handleKeyDown}
