@@ -124,6 +124,20 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 		});
 	};
 
+	const getItems = (query: string, cb: (options: any[]) => void): void => {
+		if (currentItem && query !== currentItem?.label && query !== currentItem?.value) {
+			setFormValue('');
+		}
+
+		if (currentItem && query === prevQuery) {
+			debouncedGetItems(currentItem.value, cb);
+			return;
+		}
+
+		setPrevQuery(query);
+		debouncedGetItems(query, cb);
+	};
+
 	/**
 	 * Render
 	 */
@@ -150,23 +164,7 @@ const FormSelect: FC<FormSelectFieldProps> = ({ fieldSchema, fieldProps, fieldHe
 					disabled={!!config.disabled}
 					loading={formsLoadingState === LoadingState.Loading}
 					onSelection={setFormValue}
-					asyncItems={(query: string, cb: (options: any[]) => void) => {
-						if (
-							currentItem &&
-							query !== currentItem?.label &&
-							query !== currentItem?.value
-						) {
-							setFormValue('');
-						}
-
-						if (currentItem && query === prevQuery) {
-							debouncedGetItems(currentItem.value, cb);
-							return;
-						}
-
-						setPrevQuery(query);
-						debouncedGetItems(query, cb);
-					}}
+					asyncItems={getItems}
 				/>
 			</div>
 			<Tooltip
