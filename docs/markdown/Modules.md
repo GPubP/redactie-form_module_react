@@ -2,6 +2,11 @@
 
 ## Table of contents
 
+### Interfaces
+
+- [FormSelectFieldProps](../wiki/FormSelectFieldProps)
+- [FormSelectValue](../wiki/FormSelectValue)
+
 ### Variables
 
 - [FormSelect](../wiki/Modules#formselect-1)
@@ -10,8 +15,8 @@
 
 ### FormSelect
 
-• **FormSelect**: `FC`<`FormSelectFieldProps`\>
+• **FormSelect**: `FC`<[`FormSelectFieldProps`](../wiki/FormSelectFieldProps)\>
 
 #### Defined in
 
-lib/components/Fields/FormSelect/FormSelect.tsx:20
+public/lib/components/Fields/FormSelect/FormSelect.tsx:20
